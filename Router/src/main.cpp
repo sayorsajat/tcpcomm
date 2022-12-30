@@ -9,6 +9,7 @@
 #include <string>
 
 int main() {
+    Router router;
     //create a socket
     int listening = socket(AF_INET, SOCK_STREAM, 0);
     if(listening == -1) {
@@ -67,7 +68,7 @@ int main() {
         std::cout << host << " connected on " << ntohs(client.sin_port) << std::endl;
     }
 
-    //echo messages
+    // handle messages
     char buf[4096];
     while(true) {
         // clear the buffer
@@ -86,8 +87,20 @@ int main() {
         // display message
         std::cout << "Received: " << std::string(buf, 0, bytesRecv) << std::endl;
 
-        // Echo mesage
-        send(clientSocket, buf, bytesRecv + 1, 0);
+        std::string message = std::string(buf, 0, bytesRecv);
+
+        if(message.substr(0, message.find("/hst ")) == "register me") {
+            Obj* obj;
+            obj->hostname = message.substr(message.find("/hst ") + 5, message.size());
+            char ipAddr[NI_MAXHOST];
+            inet_ntop(AF_INET, &client.sin_addr, ipAddr, NI_MAXHOST);
+            obj->ipAddress = ipAddr;
+            obj->port = ntohs(client.sin_port);
+            router.addObjectToList(obj);
+        } else {
+            router.pushMessageTo(message.substr(message.find("/dst ") + 5, (message.find("/body") - (message.find("/dst ") + 5))));
+        }
+        
     }
 
     // close socket
