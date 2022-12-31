@@ -5,6 +5,8 @@
 #include "include/messagesPassing.h"
 #include "include/Routing.h"
 
-// /dst destination-object-name/body 5 moles ethyl detected/topic getting ready/hst hostname/nof
-// register me/hst hostname
+// /type direct/dst destination-object-name/body 5 moles ethyl detected/topic getting ready/hst hostname/nof
+// /type broadcost/body 5 moles ethyl detected/topic getting ready/hst hostname/nof
+// register me/hst hostname/nof
+
 
