@@ -14,6 +14,7 @@ class Router {
     private:
         std::vector<Obj*> objectIDS;
         std::vector<std::string> messagesBuff;
+        char errorDetector;
 
         Obj* getObjectWithHostname(std::string hostname);
 

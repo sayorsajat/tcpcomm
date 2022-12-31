@@ -19,7 +19,8 @@ Obj* Router::getObjectWithHostname(std::string hostname) {
         };
     };
     Obj* obj;
-    obj->hostname = "errorOccurred";
+    errorDetector = 'a' + std::rand()%26;
+    obj->hostname = errorDetector;
     return obj;
 }
 
@@ -29,6 +30,7 @@ Router::Router() {
 
     std::vector<Obj*> IDS;
     Router::objectIDS = IDS;
+    Router::errorDetector;
 };
 
 void Router::handlePacket() {
@@ -71,7 +73,7 @@ void Router::pushMessageTo(std::string message) {
 };
 
 void Router::addObjectToList(Obj* object) {
-    if(getObjectWithHostname(object->hostname)->hostname == "errorOccurred") {
+    if(getObjectWithHostname(object->hostname)->hostname == (std::string(1, errorDetector))) {
         objectIDS.push_back(object);
     }
 }
