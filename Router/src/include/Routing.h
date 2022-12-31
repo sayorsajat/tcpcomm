@@ -17,10 +17,11 @@ class Router {
         char errorDetector;
 
         Obj* getObjectWithHostname(std::string hostname);
+        std::vector<Obj*> getObjectsWithSameTopic(std::string topic);
 
         void sendPacket(int clientSocket, std::string packet);
 
-        void handlePacket();
+        void handlePacket(std::string messageType);
 };
 
 #endif

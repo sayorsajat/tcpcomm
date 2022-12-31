@@ -88,17 +88,21 @@ int main() {
         std::cout << "Received: " << std::string(buf, 0, bytesRecv) << std::endl;
 
         std::string message = std::string(buf, 0, bytesRecv);
-
-        if(message.substr(0, message.find("/hst ")) == "register me") {
+        std::string messageType = message.substr(message.find("/type ") + 6, message.find("/nof") - message.find("/type ") + 6);
+        if(messageType == "register") {
             Obj* obj;
-            obj->hostname = message.substr(message.find("/hst ") + 5, message.size());
+            obj->hostname = message.substr(message.find("/hst ") + 5, message.find("/topic ") - message.find("/hst ") + 5);
+            std::string topic = message.substr(message.find("/topic ") + 7, message.find("/type ") - message.find("/topic ") + 7);
+            obj->topics.push_back(topic);
             char ipAddr[NI_MAXHOST];
             inet_ntop(AF_INET, &client.sin_addr, ipAddr, NI_MAXHOST);
             obj->ipAddress = ipAddr;
             obj->port = ntohs(client.sin_port);
             router.addObjectToList(obj);
+        } else if(messageType == "direct" || messageType == "broadcast") {
+            router.pushMessageTo(message);
         } else {
-            router.pushMessageTo(message.substr(message.find("/dst ") + 5, (message.find("/body") - (message.find("/dst ") + 5))));
+            std::cout << "invalid message" << std::endl;
         }
         
     }
