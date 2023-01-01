@@ -102,7 +102,8 @@ int main() {
         } else if(messageType == "direct" || messageType == "broadcast") {
             router.pushMessageTo(message);
         } else {
-            std::cout << "invalid message" << std::endl;
+            std::cout << "invalid message:" << std::endl
+                      << message << std::endl;
         }
         
     }

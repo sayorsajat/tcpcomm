@@ -20,6 +20,7 @@ class Router {
         std::vector<Obj*> getObjectsWithSameTopic(std::string topic);
 
         void sendPacket(int clientSocket, std::string packet);
+        void sendMessageToClientTask(Obj* destinationHost, std::string message);
 
         void handlePacket(std::string messageType);
 };
