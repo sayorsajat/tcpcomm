@@ -2,6 +2,7 @@
 #define OBJ_RELATED
 class Router;
 #include <string>
+#include <vector>
 #include <memory>
 #include <iostream>
 #include <bits/stdc++.h> 
@@ -10,6 +11,7 @@ class Router;
 
 struct Obj {
     std::string hostname;
+    std::vector<std::string> topics;
     int port;
     std::string ipAddress;
 };

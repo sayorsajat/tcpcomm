@@ -5,24 +5,27 @@ class Obj;
 #include <vector>
 #include "messagesPassing.h"
 
+struct ObjToTopic {
+    Obj* obj;
+    std::vector<std::string> topics;
+};
+
 class Router {
     public:
         Router();
 
         void pushMessageTo(std::string message);
         void addObjectToList(Obj* object);
+        void linkObjectToTopic(Obj* object, std::string topic);
     private:
         std::vector<Obj*> objectIDS;
+        std::vector<ObjToTopic> objectRelations;
         std::vector<std::string> messagesBuff;
-        char errorDetector;
 
-        Obj* getObjectWithHostname(std::string hostname);
-        std::vector<Obj*> getObjectsWithSameTopic(std::string topic);
+        Obj* getObjectWithID(std::string ID);
+        std::vector<Obj*> getObjectsByAcceptedTopic(std::string topic);
 
-        void sendPacket(int clientSocket, std::string packet);
-        static void sendMessageToClientTask(Obj* destinationHost, std::string message);
-
-        void handlePacket(std::string messageType);
+        void handlePacket();
 };
 
 #endif

@@ -8,8 +8,17 @@
 #include <arpa/inet.h>
 #include <string>
 
+void secondReceiver(Message_T message) {
+    std::cout << "receiver works!" << std::endl;
+}
+
+
 int main() {
     Router router;
+    Obj firstObj = Obj(router, "first");
+    Obj secObj = Obj(router, "second");
+    secObj.registerReceiver("basic", secondReceiver);
+
     //create a socket
     int listening = socket(AF_INET, SOCK_STREAM, 0);
     if(listening == -1) {
@@ -20,7 +29,7 @@ int main() {
     //bind the socket to an IP/port
     sockaddr_in hint;
     hint.sin_family = AF_INET;
-    hint.sin_port = htons(4554);
+    hint.sin_port = htons(7111);
     inet_pton(AF_INET, "0.0.0.0", &hint.sin_addr);
 
     if(bind(listening, (sockaddr*)&hint, sizeof(hint)) == -1) {
@@ -89,9 +98,8 @@ int main() {
 
         std::string message = std::string(buf, 0, bytesRecv);
         std::string messageType = message.substr(message.find("/type ") + 6, message.find("/nof") - message.find("/type ") + 6);
-        if(messageType == "register") {
-            Obj* obj;
-            obj->hostname = message.substr(message.find("/hst ") + 5, message.find("/topic ") - message.find("/hst ") + 5);
+        if(messageType == "direct" || messageType == "broadcast") {
+            std::string hostname = message.substr(message.find("/hst ") + 5, message.find("/topic ") - message.find("/hst ") + 5);
             std::string topic = message.substr(message.find("/topic ") + 7, message.find("/type ") - message.find("/topic ") + 7);
             obj->topics.push_back(topic);
             char ipAddr[NI_MAXHOST];
@@ -99,11 +107,6 @@ int main() {
             obj->ipAddress = ipAddr;
             obj->port = ntohs(client.sin_port);
             router.addObjectToList(obj);
-        } else if(messageType == "direct" || messageType == "broadcast") {
-            router.pushMessageTo(message);
-        } else {
-            std::cout << "invalid message:" << std::endl
-                      << message << std::endl;
         }
         
     }
@@ -111,5 +114,8 @@ int main() {
     // close socket
     close(clientSocket);
 
+    return 0;
+
+    firstObj.passMessageTo(router, "second", "msg body", "basic", true);
     return 0;
 }
