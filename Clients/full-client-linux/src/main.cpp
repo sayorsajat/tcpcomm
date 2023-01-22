@@ -9,7 +9,7 @@
 #include <arpa/inet.h>
 #include <string>
 // define name for this host
-#define HOSTNAME "basic-data-provider"
+#define HOSTNAME "firstObj"
 
 void secondReceiver(Message_T message) {
     std::cout << "receiver works!" << std::endl;
@@ -24,7 +24,7 @@ void secondReceiver(Message_T message) {
 
     // create a hint structure for the server
     int port = 4554; // you can change the port, but you will need to change router port also
-    std::string ipAddress = "YOUR ROUTER IP ADDRESS";
+    std::string ipAddress = "192.168.0.108";
     sockaddr_in hint;
     hint.sin_family = AF_INET;
     hint.sin_port = htons(port);
@@ -60,7 +60,7 @@ int main() {
 
     // create a hint structure for the main router
     int port = 4554; // you can change the port, but you will need to change router port also
-    std::string ipAddress = "YOUR ROUTER IP ADDRESS";
+    std::string ipAddress = "192.168.0.108";
     sockaddr_in shint;
     shint.sin_family = AF_INET;
     shint.sin_port = htons(port);
@@ -73,10 +73,17 @@ int main() {
         return -2;
     }
 
-    std::string regMessage = createMessage(HOSTNAME);
+    std::string regMessage = createMessage(HOSTNAME, "basic");
 
     // register our host if it is not already
     int regRequestRes = send(sock, regMessage.c_str(), regMessage.size() + 1, 0);
+
+    // send broadcast message because I want to test if another full client will respond to me
+    std::string resMessage = createMessage("broadcast", "message 4 response", "basic", HOSTNAME);
+
+    // register our host if it is not already
+    int resRequestRes = send(sock, resMessage.c_str(), resMessage.size() + 1, 0);
+
 
     // -------------------------------------------------------------
 

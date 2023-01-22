@@ -12,8 +12,8 @@ string createMessage(string type, string destHost, string body, string topic, st
 string createMessage(string type, string body, string topic, string srcHost) {
     return "/type " + type + "/body " + body + "/topic " + topic + "/hst " + srcHost + "/nof"; 
 };
-string createMessage(string srcHost) {
-    return "register me/hst " + srcHost + "/nof";
+string createMessage(string srcHost, string topic) {
+    return "/hst " + srcHost + "/topic " + topic + "/type register/nof";
 };
 
 #endif
