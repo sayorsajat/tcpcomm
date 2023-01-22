@@ -1,5 +1,6 @@
 #include "include/Routing.h"
 #include "include/messagesPassing.h"
+#include "messages.h"
 #include <iostream>
 #include <unistd.h>
 #include <netdb.h>
@@ -7,9 +8,39 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <string>
+// define name for this host
+#define HOSTNAME "basic-data-provider"
 
 void secondReceiver(Message_T message) {
     std::cout << "receiver works!" << std::endl;
+
+    
+    //create a socket
+    int sock = socket(AF_INET, SOCK_STREAM, 0);
+    if(sock == -1) {
+        std::cerr << "error while creating socket" << std::endl;
+        return;
+    }
+
+    // create a hint structure for the server
+    int port = 4554; // you can change the port, but you will need to change router port also
+    std::string ipAddress = "YOUR ROUTER IP ADDRESS";
+    sockaddr_in hint;
+    hint.sin_family = AF_INET;
+    hint.sin_port = htons(port);
+    inet_pton(AF_INET, ipAddress.c_str(), &hint.sin_addr);
+
+    // connect to router
+    int connRes = connect(sock, (sockaddr*)&hint, sizeof(sockaddr_in));
+    if(connRes == -1) {
+        std::cerr << "error while connecting to router" << std::endl;
+        return;
+    }
+
+    std::string resMessage = createMessage("direct", message.src_host, "response message, do you hear me?!", message.topic, HOSTNAME);
+
+    // register host if it is not already
+    int resRequestRes = send(sock, resMessage.c_str(), resMessage.size() + 1, 0);
 }
 
 
@@ -17,9 +48,39 @@ int main() {
     Router router;
     Obj firstObj = Obj(router, "first");
     Obj secObj = Obj(router, "second");
-    secObj.registerReceiver("basic", secondReceiver);
+    secObj.registerReceiver(router, "basic", secondReceiver);
 
-    //create a socket
+
+    //create a socket for client part
+    int sock = socket(AF_INET, SOCK_STREAM, 0);
+    if(sock == -1) {
+        std::cerr << "error while creating socket" << std::endl;
+        return -1;
+    }
+
+    // create a hint structure for the main router
+    int port = 4554; // you can change the port, but you will need to change router port also
+    std::string ipAddress = "YOUR ROUTER IP ADDRESS";
+    sockaddr_in shint;
+    shint.sin_family = AF_INET;
+    shint.sin_port = htons(port);
+    inet_pton(AF_INET, ipAddress.c_str(), &shint.sin_addr);
+
+    // connect to router
+    int connRes = connect(sock, (sockaddr*)&shint, sizeof(sockaddr_in));
+    if(connRes == -1) {
+        std::cerr << "error while connecting to router" << std::endl;
+        return -2;
+    }
+
+    std::string regMessage = createMessage(HOSTNAME);
+
+    // register our host if it is not already
+    int regRequestRes = send(sock, regMessage.c_str(), regMessage.size() + 1, 0);
+
+    // -------------------------------------------------------------
+
+    //create a server part socket (for responding)
     int listening = socket(AF_INET, SOCK_STREAM, 0);
     if(listening == -1) {
         std::cerr << "error while creating socket" << std::endl;
@@ -99,14 +160,7 @@ int main() {
         std::string message = std::string(buf, 0, bytesRecv);
         std::string messageType = message.substr(message.find("/type ") + 6, message.find("/nof") - message.find("/type ") + 6);
         if(messageType == "direct" || messageType == "broadcast") {
-            std::string hostname = message.substr(message.find("/hst ") + 5, message.find("/topic ") - message.find("/hst ") + 5);
-            std::string topic = message.substr(message.find("/topic ") + 7, message.find("/type ") - message.find("/topic ") + 7);
-            obj->topics.push_back(topic);
-            char ipAddr[NI_MAXHOST];
-            inet_ntop(AF_INET, &client.sin_addr, ipAddr, NI_MAXHOST);
-            obj->ipAddress = ipAddr;
-            obj->port = ntohs(client.sin_port);
-            router.addObjectToList(obj);
+            router.pushMessageTo(message);
         }
         
     }
@@ -114,8 +168,5 @@ int main() {
     // close socket
     close(clientSocket);
 
-    return 0;
-
-    firstObj.passMessageTo(router, "second", "msg body", "basic", true);
     return 0;
 }

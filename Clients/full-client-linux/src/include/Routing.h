@@ -16,10 +16,8 @@ class Router {
 
         void pushMessageTo(std::string message);
         void addObjectToList(Obj* object);
-        void linkObjectToTopic(Obj* object, std::string topic);
     private:
         std::vector<Obj*> objectIDS;
-        std::vector<ObjToTopic> objectRelations;
         std::vector<std::string> messagesBuff;
 
         Obj* getObjectWithID(std::string ID);

@@ -29,6 +29,7 @@ struct Receiver {
 class Obj {
 	public:
         std::string messageSourceHostID;
+        std::vector<Receiver> receivers;
 
         Obj(Router & router, std::string ID);
 
@@ -50,7 +51,7 @@ class Obj {
         void passMessageTo(Router router, std::string destObjId, std::string messageBody, std::string messageTopic = "basic", bool provideSrcHost = false);
         void receiveMessage(Message_T message);
     private:
-        std::vector<Receiver> receivers;
+        
         std::function<void(Message_T message)> getFunctionById(std::string topic);
 };
 
