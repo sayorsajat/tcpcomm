@@ -88,11 +88,11 @@ int main() {
         std::cout << "Received: " << std::string(buf, 0, bytesRecv) << std::endl;
 
         std::string message = std::string(buf, 0, bytesRecv);
-        std::string messageType = message.substr(message.find("/type ") + 6, message.find("/nof") - message.find("/type ") + 6);
+        std::string messageType = message.substr(message.find("/type ") + 6, message.find("/nof") - (message.find("/type ") + 6));
         if(messageType == "register") {
-            Obj* obj;
-            obj->hostname = message.substr(message.find("/hst ") + 5, message.find("/topic ") - message.find("/hst ") + 5);
-            std::string topic = message.substr(message.find("/topic ") + 7, message.find("/type ") - message.find("/topic ") + 7);
+            Obj* obj = new Obj;
+            obj->hostname = message.substr(message.find("/hst ") + 5, message.find("/topic ") -( message.find("/hst ") + 5));
+            std::string topic = message.substr(message.find("/topic ") + 7, message.find("/type ") - (message.find("/topic ") + 7));
             obj->topics.push_back(topic);
             char ipAddr[NI_MAXHOST];
             inet_ntop(AF_INET, &client.sin_addr, ipAddr, NI_MAXHOST);

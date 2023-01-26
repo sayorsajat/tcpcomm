@@ -20,7 +20,7 @@ Obj* Router::getObjectWithHostname(std::string hostname) {
             return i;
         };
     };
-    Obj* obj;
+    Obj* obj = new Obj;
     errorDetector = 'a' + std::rand()%26;
     obj->hostname = errorDetector;
     return obj;

@@ -37,9 +37,9 @@ void secondReceiver(Message_T message) {
         return;
     }
 
-    std::string resMessage = createMessage("direct", message.src_host, "response message, do you hear me?!", message.topic, HOSTNAME);
+    std::string resMessage = createMessage(message.src_host, "response message, do you hear me?!", message.topic, HOSTNAME);
 
-    // register host if it is not already
+    // send request
     int resRequestRes = send(sock, resMessage.c_str(), resMessage.size() + 1, 0);
 }
 
@@ -79,7 +79,7 @@ int main() {
     int regRequestRes = send(sock, regMessage.c_str(), regMessage.size() + 1, 0);
 
     // send broadcast message because I want to test if another full client will respond to me
-    std::string resMessage = createMessage("broadcast", "message 4 response", "basic", HOSTNAME);
+    std::string resMessage = createMessage("message 4 response", "basic", HOSTNAME);
 
     // register our host if it is not already
     int resRequestRes = send(sock, resMessage.c_str(), resMessage.size() + 1, 0);
@@ -165,7 +165,7 @@ int main() {
         std::cout << "Received: " << std::string(buf, 0, bytesRecv) << std::endl;
 
         std::string message = std::string(buf, 0, bytesRecv);
-        std::string messageType = message.substr(message.find("/type ") + 6, message.find("/nof") - message.find("/type ") + 6);
+        std::string messageType = message.substr(message.find("/type ") + 6, message.find("/nof") - (message.find("/type ") + 6));
         if(messageType == "direct" || messageType == "broadcast") {
             router.pushMessageTo(message);
         }
