@@ -76,10 +76,10 @@ void Router::sendMessageToClientTask(Obj* destinationHost, std::string message) 
     }
 
     close(sock);
-    delete &sock;
-    delete &hint;
-    delete &connectRes;
-    delete &sendRes;
+    // delete &sock;
+    // delete &hint;
+    // delete &connectRes;
+    // delete &sendRes;
 };
 
 void Router::handlePacket(std::string messageType) {
