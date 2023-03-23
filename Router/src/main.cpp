@@ -7,6 +7,7 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <string>
+#include <thread>
 
 void handleClient(int clientSocket, sockaddr_in client, Router & router) {
     // handle messages
@@ -84,6 +85,8 @@ int main() {
     char host[NI_MAXHOST];
     char svc[NI_MAXSERV];
 
+    std::vector<std::thread> threads;  // container to store threads
+
     while(true) {
         int clientSocket = accept(listening, 
                             (sockaddr*)&client, 
@@ -112,9 +115,15 @@ int main() {
             std::cout << host << " connected on " << ntohs(client.sin_port) << std::endl;
         }
 
-        handleClient(clientSocket, client, router);
+        int clientSocketCopy = clientSocket;
+
+        threads.emplace_back(handleClient, std::ref(clientSocketCopy), std::ref(client), std::ref(router));// add thread to container
     }
-    
+
+    // join all threads before exiting
+    for (auto& thread : threads) {
+        thread.join();
+    }
 
     return 0;
 }
