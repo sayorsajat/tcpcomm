@@ -100,7 +100,7 @@ void Router::handlePacket(std::string messageType) {
             sendMessageToClientTask(destinationHost, decoPacket);
         } else if(messageType == "broadcast") {
             std::cout << "message type was recognized as `broadcast`" << std::endl;
-            std::string topic = decoPacket.substr(decoPacket.find("/topic ") + 7, decoPacket.find("/hst ") - decoPacket.find("/topic ") + 7);
+            std::string topic = decoPacket.substr(decoPacket.find("/topic ") + 7, decoPacket.find("/hst ") - (decoPacket.find("/topic ") + 7));
             std::vector<Obj*> objects = getObjectsWithSameTopic(topic);
             std::cout << "objects with same topic extracted" << std::endl;
             std::cout << "object hostnames: ";
