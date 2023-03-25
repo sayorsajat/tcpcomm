@@ -88,7 +88,8 @@ void Router::sendMessageToClientTask(Obj* destinationHost, std::string message) 
 void Router::handlePacket(std::string messageType) {
     if (!messagesBuff.empty()) {
         std::string decoPacket = messagesBuff[messagesBuff.size()-1];
-
+        std::cout << "buffer was not empty, all right" << std::endl
+                  << "message type: " << messageType << std::endl;
         if(messageType == "direct") {
             std::cout << "message type was recognized as `direct`" << std::endl;
             std::string destinationHostID = decoPacket.substr(decoPacket.find("/dst ") + 5, (decoPacket.find("/body") - (decoPacket.find("/dst ") + 5)));
@@ -129,7 +130,7 @@ void Router::pushMessageTo(std::string message) {
     std::cout << "before pushing message" << std::endl;
     messagesBuff.push_back(message);
     std::cout << "after pushing message" << std::endl;
-    std::string messageType = message.substr(message.find("/type ") + 6, message.find("/nof") - message.find("/type ") + 6);
+    std::string messageType = message.substr(message.find("/type ") + 6, message.find("/nof") - (message.find("/type ") + 6));
     handlePacket(messageType);
     std::cout << "handlePacket called succesfully" << std::endl;
 };
