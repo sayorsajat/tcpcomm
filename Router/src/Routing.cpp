@@ -103,6 +103,11 @@ void Router::handlePacket(std::string messageType) {
             std::string topic = decoPacket.substr(decoPacket.find("/topic ") + 7, decoPacket.find("/hst ") - decoPacket.find("/topic ") + 7);
             std::vector<Obj*> objects = getObjectsWithSameTopic(topic);
             std::cout << "objects with same topic extracted" << std::endl;
+            std::cout << "object hostnames: ";
+            for(auto j: objects) {
+                std::cout << j->hostname << ", ";
+            }
+            std::cout << std::endl;
 
             // define number of tasks to complete
             std::vector<int> tasks;
@@ -114,7 +119,11 @@ void Router::handlePacket(std::string messageType) {
             // create a thread pool
             std::vector<std::thread> threads;
             for(int taskID : tasks) {
-                threads.emplace_back(sendMessageToClientTask, objects[taskID], decoPacket);
+                try {
+                    threads.emplace_back(sendMessageToClientTask, objects[taskID], decoPacket);
+                } catch(const std::system_error& e) {
+                    std::cerr << "Error creating thread: " << e.what() << std::endl;
+                }
             }
             std::cout << "created thread pool" << std::endl;
 
