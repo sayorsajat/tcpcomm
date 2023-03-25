@@ -10,6 +10,7 @@
 #include <thread>
 
 void handleClient(int clientSocket, sockaddr_in client, Router & router) {
+    std::cout << "`handleClient` successfully called" << std::endl;
     // handle messages
     char buf[4096];
     while(true) {
@@ -32,6 +33,7 @@ void handleClient(int clientSocket, sockaddr_in client, Router & router) {
         std::string message = std::string(buf, 0, bytesRecv);
         std::string messageType = message.substr(message.find("/type ") + 6, message.find("/nof") - (message.find("/type ") + 6));
         if(messageType == "register") {
+            std::cout << "Recognized `register` type" << std::endl;
             Obj* obj = new Obj;
             obj->hostname = message.substr(message.find("/hst ") + 5, message.find("/topic ") -( message.find("/hst ") + 5));
             std::string topic = message.substr(message.find("/topic ") + 7, message.find("/type ") - (message.find("/topic ") + 7));
@@ -40,8 +42,18 @@ void handleClient(int clientSocket, sockaddr_in client, Router & router) {
             inet_ntop(AF_INET, &client.sin_addr, ipAddr, NI_MAXHOST);
             obj->ipAddress = ipAddr;
             obj->port = ntohs(client.sin_port);
+            std::cout << "Registered object:" << std::endl 
+                      << "hostname: " << obj->hostname << std::endl
+                      << "IPv4" << obj->ipAddress << std::endl
+                      << "port: " << obj->port << std::endl
+                      << "topics: " << std::endl;
+            for(auto i: obj->topics) {
+                std::cout << i << ", ";
+            }
+            std::cout << std::endl;
             router.addObjectToList(obj);
         } else if(messageType == "direct" || messageType == "broadcast") {
+            std::cout << "Recognized `direct` or `broadcast` type" << std::endl;
             router.pushMessageTo(message);
         } else {
             std::cout << "invalid message:" << std::endl

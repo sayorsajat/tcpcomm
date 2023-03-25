@@ -48,7 +48,7 @@ Router::Router() {
 };
 
 void Router::sendMessageToClientTask(Obj* destinationHost, std::string message) {
-
+    std::cout << "creating socket" << std::endl;
     // Create socket
     int sock = socket(AF_INET, SOCK_STREAM, 0);
     if (sock == -1) {
@@ -59,8 +59,9 @@ void Router::sendMessageToClientTask(Obj* destinationHost, std::string message) 
     // hint structure for destination end-system
     sockaddr_in hint;
     hint.sin_family = AF_INET;
-    hint.sin_port = htons(destinationHost->port);
+    hint.sin_port = htons(7111);
     inet_pton(AF_INET, destinationHost->ipAddress.c_str(), &hint.sin_addr);
+    std::cout << "created destination hint" << std::endl;
 
     // connect to
     int connectRes = connect(sock, (sockaddr*)&hint, sizeof(hint));
@@ -68,12 +69,14 @@ void Router::sendMessageToClientTask(Obj* destinationHost, std::string message) 
         std::cerr << "can't connect to socket" << std::endl;
         return;
     }
+    std::cout << "connected to destination host" << std::endl;
 
     // sending
     int sendRes = send(sock, message.c_str(), message.size() + 1, 0);
     if(sendRes == -1) {
         std::cout << "Could not send to client!" << std::endl;
     }
+    std::cout << "sent " << sendRes << "bytes" << std::endl;
 
     close(sock);
     // delete &sock;
@@ -87,13 +90,18 @@ void Router::handlePacket(std::string messageType) {
         std::string decoPacket = messagesBuff[messagesBuff.size()-1];
 
         if(messageType == "direct") {
+            std::cout << "message type was recognized as `direct`" << std::endl;
             std::string destinationHostID = decoPacket.substr(decoPacket.find("/dst ") + 5, (decoPacket.find("/body") - (decoPacket.find("/dst ") + 5)));
             Obj* destinationHost = getObjectWithHostname(destinationHostID);
 
+            std::cout << "destination host extracted" << std::endl;
+
             sendMessageToClientTask(destinationHost, decoPacket);
         } else if(messageType == "broadcast") {
+            std::cout << "message type was recognized as `broadcast`" << std::endl;
             std::string topic = decoPacket.substr(decoPacket.find("/topic ") + 7, decoPacket.find("/hst ") - decoPacket.find("/topic ") + 7);
             std::vector<Obj*> objects = getObjectsWithSameTopic(topic);
+            std::cout << "objects with same topic extracted" << std::endl;
 
             // define number of tasks to complete
             std::vector<int> tasks;
@@ -101,11 +109,13 @@ void Router::handlePacket(std::string messageType) {
                 tasks.push_back(i);
             }
 
+            std::cout << "creating thread pool" << std::endl;
             // create a thread pool
             std::vector<std::thread> threads;
             for(int taskID : tasks) {
                 threads.emplace_back(sendMessageToClientTask, objects[taskID], decoPacket);
             }
+            std::cout << "created thread pool" << std::endl;
 
             // wait for all threads to finish
             for(std::thread& t : threads) {
@@ -116,9 +126,12 @@ void Router::handlePacket(std::string messageType) {
 };
 
 void Router::pushMessageTo(std::string message) {
+    std::cout << "before pushing message" << std::endl;
     messagesBuff.push_back(message);
+    std::cout << "after pushing message" << std::endl;
     std::string messageType = message.substr(message.find("/type ") + 6, message.find("/nof") - message.find("/type ") + 6);
     handlePacket(messageType);
+    std::cout << "handlePacket called succesfully" << std::endl;
 };
 
 void Router::addObjectToList(Obj* object) {
@@ -126,11 +139,15 @@ void Router::addObjectToList(Obj* object) {
 
     // if object is not registered
     if(registeredObject->hostname == (std::string(1, errorDetector))) {
+        std::cout << "object was not registered" << std::endl;
         objectIDS.push_back(object);
         errorDetector = ' ';
+        std::cout << "object was successfully added to objectIDS" << std::endl;
 
         // if client wants to subscribe to new topic
     } else if(std::find(registeredObject->topics.begin(), registeredObject->topics.end(), object->topics[0]) != registeredObject->topics.end()) {
+        std::cout << "object requested to join new topic" << std::endl;
         registeredObject->topics.push_back(object->topics[0]);
+        std::cout << "successfully added topic" << std::endl;
     }
 }

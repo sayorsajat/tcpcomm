@@ -76,18 +76,32 @@ int main() {
     std::string regMessage = createMessage(HOSTNAME, "basic");
 
     // register our host if it is not already
-    int regRequestRes = send(sock, regMessage.c_str(), regMessage.size() + 1, 0);
+    int regRequestRes = send(sock, regMessage.c_str(), regMessage.size(), 0);
+
+    close(sock);
+
+    sock = socket(AF_INET, SOCK_STREAM, 0);
+    if(sock == -1) {
+        std::cerr << "error while creating socket" << std::endl;
+        return -1;
+    }
+    // connect to router
+    connRes = connect(sock, (sockaddr*)&shint, sizeof(sockaddr_in));
+    if(connRes == -1) {
+        std::cerr << "error while connecting to router" << std::endl;
+        return -2;
+    }
 
     // send broadcast message because I want to test if another full client will respond to me
     std::string resMessage = createMessage("message 4 response", "basic", HOSTNAME);
 
-    // register our host if it is not already
-    int resRequestRes = send(sock, resMessage.c_str(), resMessage.size() + 1, 0);
+    int resRequestRes = send(sock, resMessage.c_str(), resMessage.size(), 0);
 
 
     // -------------------------------------------------------------
+    //create a server part (for responding)
 
-    //create a server part socket (for responding)
+
     int listening = socket(AF_INET, SOCK_STREAM, 0);
     if(listening == -1) {
         std::cerr << "error while creating socket" << std::endl;
