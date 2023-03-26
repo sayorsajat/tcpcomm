@@ -14,6 +14,7 @@ void handleClient(int clientSocket, sockaddr_in client, Router & router) {
     // handle messages
     const int MAX_BUF_SIZE = 4096;
     std::vector<char> buf(MAX_BUF_SIZE);
+    std::vector<char> receivedData;
     while(true) {
         // clear the buffer
         std::memset(buf.data(), 0, MAX_BUF_SIZE);
@@ -28,10 +29,22 @@ void handleClient(int clientSocket, sockaddr_in client, Router & router) {
             break;
         }
 
-        // display message
-        std::cout << "Received: " << std::string(buf.data(), bytesRecv) << std::endl;
+        // accumulate received data in a buffer
+        receivedData.insert(receivedData.end(), buf.begin(), buf.begin() + bytesRecv);
 
-        std::string message = std::string(buf.data(), bytesRecv);
+        // check if we have received a complete message
+        auto pos = std::find(receivedData.begin(), receivedData.end(), '\n');
+        std::string message;
+        if (pos != receivedData.end()) {
+            // extract the message and remove it from the buffer
+            message = std::string(receivedData.begin(), pos);
+            receivedData.erase(receivedData.begin(), pos + 1);
+
+            // display the message
+            std::cout << "Received: " << message << std::endl;
+        }
+
+        //std::string message = std::string(buf.data(), bytesRecv);
         std::string messageType = message.substr(message.find("/type ") + 6, message.find("/nof") - (message.find("/type ") + 6));
         if(messageType == "register") {
             std::cout << "Recognized `register` type" << std::endl;
