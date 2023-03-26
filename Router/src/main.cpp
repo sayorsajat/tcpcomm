@@ -28,16 +28,21 @@ void handleClient(int clientSocket, sockaddr_in client, Router & router) {
             std::cout << "Client disconnected" << std::endl;
             break;
         }
+        
+        std::string message;
 
         // accumulate received data in a buffer
         receivedData.insert(receivedData.end(), buf.begin(), buf.begin() + bytesRecv);
 
         // check if we have received a complete message
         auto pos = std::search(receivedData.begin(), receivedData.end(), std::begin("/nof"), std::end("/nof"));
-        std::string message;
         if (pos != receivedData.end()) {
             // extract the message and remove it from the buffer
-            message = std::string(receivedData.begin(), pos);
+            if (!receivedData.empty()) { // add a check for empty vector
+                message = std::string(receivedData.begin(), pos);
+            } else {
+                message.clear();
+            }
             receivedData.erase(receivedData.begin(), pos + 4); // remove "/nof" from the buffer
 
             // display the message
