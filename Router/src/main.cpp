@@ -33,15 +33,23 @@ void handleClient(int clientSocket, sockaddr_in client, Router & router) {
         receivedData.insert(receivedData.end(), buf.begin(), buf.begin() + bytesRecv);
 
         // check if we have received a complete message
-        auto pos = std::find(receivedData.begin(), receivedData.end(), '\n');
+        auto pos = std::search(receivedData.begin(), receivedData.end(), std::begin("/nof"), std::end("/nof"));
         std::string message;
         if (pos != receivedData.end()) {
             // extract the message and remove it from the buffer
             message = std::string(receivedData.begin(), pos);
-            receivedData.erase(receivedData.begin(), pos + 1);
+            receivedData.erase(receivedData.begin(), pos + 4); // remove "/nof" from the buffer
 
             // display the message
             std::cout << "Received: " << message << std::endl;
+        } else if (receivedData.size() > MAX_BUF_SIZE) {
+            // if the buffer is full and we haven't received a complete message,
+            // assume that the data is a partial message and display it
+            message = std::string(receivedData.begin(), receivedData.end());
+            receivedData.clear();
+
+            // display the partial message
+            std::cout << "Received partial message: " << message << std::endl;
         }
 
         //std::string message = std::string(buf.data(), bytesRecv);
