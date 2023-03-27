@@ -13,13 +13,13 @@ void handleClient(int clientSocket, sockaddr_in client, Router & router) {
     std::cout << "`handleClient` successfully called" << std::endl;
     // handle messages
     const int MAX_BUF_SIZE = 4096;
-    std::vector<char> buf(MAX_BUF_SIZE);
-    std::vector<char> receivedData;
+
+    char buf[MAX_BUF_SIZE];
     while(true) {
         // clear the buffer
-        std::memset(buf.data(), 0, MAX_BUF_SIZE);
+        std::memset(buf, 0, MAX_BUF_SIZE);
         // wait for a message
-        int bytesRecv = recv(clientSocket, buf.data(), MAX_BUF_SIZE, 0);
+        int bytesRecv = recv(clientSocket, buf, MAX_BUF_SIZE, 0);
         if (bytesRecv == -1) {
             std::cerr << "Connection issue" << std::endl;
             break;
@@ -31,30 +31,13 @@ void handleClient(int clientSocket, sockaddr_in client, Router & router) {
         
         std::string message;
 
-        // accumulate received data in a buffer
-        receivedData.insert(receivedData.end(), buf.begin(), buf.begin() + bytesRecv);
-
-        // check if we have received a complete message
-        auto pos = std::search(receivedData.begin(), receivedData.end(), std::begin("/nof"), std::end("/nof"));
-        if (pos != receivedData.end()) {
-            // extract the message and remove it from the buffer
-            if (!receivedData.empty()) { // add a check for empty vector
-                message = std::string(receivedData.begin(), pos);
-            } else {
-                message.clear();
-            }
-            receivedData.erase(receivedData.begin(), pos + 4); // remove "/nof" from the buffer
-
-            // display the message
-            std::cout << "Received: " << message << std::endl;
-        } else if (receivedData.size() > MAX_BUF_SIZE) {
-            // if the buffer is full and we haven't received a complete message,
-            // assume that the data is a partial message and display it
-            message = std::string(receivedData.begin(), receivedData.end());
-            receivedData.clear();
-
-            // display the partial message
-            std::cout << "Received partial message: " << message << std::endl;
+        int valread;
+        while ((valread = read(clientSocket, buf, MAX_BUF_SIZE)) > 0) {
+            std::cout << "Received " << valread << " bytes: ";
+            std::cout.write(buf, valread);
+            std::cout << std::endl;
+            message+=buf;
+            std::memset(buf, 0, MAX_BUF_SIZE);
         }
 
         //std::string message = std::string(buf.data(), bytesRecv);
