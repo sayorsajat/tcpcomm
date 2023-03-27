@@ -158,11 +158,16 @@ void Router::pushMessageTo(std::string message) {
         return;
     }
 
-    std::cout << "posType: " << posType << ", posNof: " << posNof << std::endl;
-
     std::cout << "message: " << message << std::endl;
-
-    std::string messageType = message.substr(posType + 6, posNof - (posType + 6));
+    std::string messageType;
+    try {
+        messageType = message.substr(posType + 6, posNof - (posType + 6));
+    } catch (const std::out_of_range& ex) {
+        std::cerr << "(inside pushMessageTo)Error: Out of range exception caught: " << ex.what() << std::endl;
+    } catch (const std::exception& ex) {
+        std::cerr << "(inside pushMessageTo)Error: Exception caught: " << ex.what() << std::endl;
+    }
+    
     handlePacket(messageType, message);
     std::cout << "handlePacket called successfully" << std::endl;
 };

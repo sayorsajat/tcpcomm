@@ -16,7 +16,7 @@
         //     std::cout << "Client disconnected" << std::endl;
         //     break;
         // }
-void handleClient(int clientSocket, sockaddr_in client, Router & router) {
+void handleClient(int clientSocket, sockaddr_in & client, Router & router) {
     std::cout << "`handleClient` successfully called" << std::endl;
     // handle messages
     const int MAX_BUF_SIZE = 4096;
@@ -38,7 +38,15 @@ void handleClient(int clientSocket, sockaddr_in client, Router & router) {
             std::memset(buf, 0, MAX_BUF_SIZE);
         }
 
-        std::string messageType = message.substr(message.find("/type ") + 6, message.find("/nof") - (message.find("/type ") + 6));
+        std::string messageType;
+        try {
+            messageType = message.substr(message.find("/type ") + 6, message.find("/nof") - (message.find("/type ") + 6));
+        } catch (const std::out_of_range& ex) {
+            std::cerr << "Error: Out of range exception caught: " << ex.what() << std::endl;
+        } catch (const std::exception& ex) {
+            std::cerr << "Error: Exception caught: " << ex.what() << std::endl;
+        }
+
         if(messageType == "register") {
             std::cout << "Recognized `register` type" << std::endl;
             // close socket
