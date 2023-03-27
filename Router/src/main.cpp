@@ -38,6 +38,10 @@ void handleClient(int clientSocket, sockaddr_in & client, Router & router) {
             std::memset(buf, 0, MAX_BUF_SIZE);
         }
 
+        if(message.empty()) {
+            return;
+        }
+
         std::string messageType;
         try {
             messageType = message.substr(message.find("/type ") + 6, message.find("/nof") - (message.find("/type ") + 6));
