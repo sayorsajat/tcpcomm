@@ -14,6 +14,9 @@
 #include "include/Routing.h"
 
 Obj* Router::getObjectWithHostname(std::string hostname) {
+    if(objectIDS.empty()) {
+        return;
+    }
     
     for (auto i: objectIDS) {
         if(i->hostname==hostname) {
@@ -28,6 +31,10 @@ Obj* Router::getObjectWithHostname(std::string hostname) {
 
 std::vector<Obj*> Router::getObjectsWithSameTopic(std::string topic) {
     std::vector<Obj*> objects;
+
+    if(objectIDS.empty()) {
+        return;
+    }
 
     for (auto i: objectIDS) {
         if(std::find(i->topics.begin(), i->topics.end(), topic) != i->topics.end()) {
