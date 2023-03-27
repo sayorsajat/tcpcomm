@@ -138,7 +138,7 @@ void Router::handlePacket(std::string messageType, std::string & decoPacket) {
 
 void Router::pushMessageTo(std::string message) {
     size_t posType = message.find("/type ");
-    size_t posNof = message.find("/nof ");
+    size_t posNof = message.find("/nof");
     
     if (posType == std::string::npos || posNof == std::string::npos) {
         std::cerr << "Invalid message format: " << message << std::endl;
