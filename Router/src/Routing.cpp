@@ -98,6 +98,12 @@ void Router::handlePacket(std::string messageType, std::string & decoPacket) {
             sendMessageToClientTask(destinationHost, decoPacket);
         } else if(messageType == "broadcast") {
             std::cout << "message type was recognized as `broadcast`" << std::endl;
+            size_t posTopic = decoPacket.find("/topic ");
+            size_t posHst = decoPacket.find("/hst ");
+            if (posTopic == std::string::npos || posHst == std::string::npos || posTopic >= posHst) {
+                std::cerr << "Invalid message format for broadcast message: " << decoPacket << std::endl;
+                return;
+            }
             std::string topic = decoPacket.substr(decoPacket.find("/topic ") + 7, decoPacket.find("/hst ") - (decoPacket.find("/topic ") + 7));
             std::vector<Obj*> objects = getObjectsWithSameTopic(topic);
             std::cout << "objects with same topic extracted" << std::endl;
