@@ -39,9 +39,6 @@ std::vector<Obj*> Router::getObjectsWithSameTopic(std::string topic) {
 };
 
 Router::Router() {
-    std::vector<std::string> messagesBuf;
-    Router::messagesBuff = messagesBuf;
-
     std::vector<Obj*> IDS;
     Router::objectIDS = IDS;
     Router::errorDetector;
@@ -85,11 +82,12 @@ void Router::sendMessageToClientTask(Obj* destinationHost, std::string message) 
     // delete &sendRes;
 };
 
-void Router::handlePacket(std::string messageType) {
+void Router::handlePacket(std::string messageType, std::string & decoPacket) {
     if (!messagesBuff.empty()) {
-        std::string decoPacket = messagesBuff[messagesBuff.size()-1];
         std::cout << "buffer was not empty, all right" << std::endl
                   << "message type: " << messageType << std::endl;
+        std::cout << "message: " << decoPacket << std::endl
+                  << "size of message: " << decoPacket.size() << std::endl;
         if(messageType == "direct") {
             std::cout << "message type was recognized as `direct`" << std::endl;
             std::string destinationHostID = decoPacket.substr(decoPacket.find("/dst ") + 5, (decoPacket.find("/body") - (decoPacket.find("/dst ") + 5)));
@@ -140,10 +138,9 @@ void Router::handlePacket(std::string messageType) {
 
 void Router::pushMessageTo(std::string message) {
     std::cout << "before pushing message" << std::endl;
-    messagesBuff.push_back(message);
     std::cout << "after pushing message" << std::endl;
     std::string messageType = message.substr(message.find("/type ") + 6, message.find("/nof") - (message.find("/type ") + 6));
-    handlePacket(messageType);
+    handlePacket(messageType, message);
     std::cout << "handlePacket called succesfully" << std::endl;
 };
 
