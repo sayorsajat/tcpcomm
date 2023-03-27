@@ -15,9 +15,12 @@
 
 Obj* Router::getObjectWithHostname(std::string hostname) {
     if(objectIDS.empty()) {
-        return;
+        Obj* obj = new Obj;
+        errorDetector = 'a' + std::rand()%26;
+        obj->hostname = errorDetector;
+        return obj;
     }
-    
+
     for (auto i: objectIDS) {
         if(i->hostname==hostname) {
             return i;
@@ -33,7 +36,7 @@ std::vector<Obj*> Router::getObjectsWithSameTopic(std::string topic) {
     std::vector<Obj*> objects;
 
     if(objectIDS.empty()) {
-        return;
+        return objects;
     }
 
     for (auto i: objectIDS) {
@@ -109,7 +112,7 @@ void Router::handlePacket(std::string messageType, std::string & decoPacket) {
             std::string topic = decoPacket.substr(decoPacket.find("/topic ") + 7, decoPacket.find("/hst ") - (decoPacket.find("/topic ") + 7));
             std::cout << "extracted topic: " << topic << std::endl;
             std::vector<Obj*> objects = getObjectsWithSameTopic(topic);
-            if(objects.size() <= 0) {
+            if(objects.empty()) {
                 return;
             }
             std::cout << "objects with same topic extracted" << std::endl;
