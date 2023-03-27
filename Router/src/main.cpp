@@ -38,7 +38,6 @@ void handleClient(int clientSocket, sockaddr_in client, Router & router) {
             std::memset(buf, 0, MAX_BUF_SIZE);
         }
 
-        //std::string message = std::string(buf.data(), bytesRecv);
         std::string messageType = message.substr(message.find("/type ") + 6, message.find("/nof") - (message.find("/type ") + 6));
         if(messageType == "register") {
             std::cout << "Recognized `register` type" << std::endl;

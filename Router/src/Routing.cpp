@@ -153,6 +153,13 @@ void Router::pushMessageTo(std::string message) {
     size_t posType = message.find("/type ");
     size_t posNof = message.find("/nof");
 
+    if (message.empty()) {
+        std::cout << "Error: Empty message string" << std::endl;
+        return;
+    }
+
+    std::cout << "posType: " << posType << ", posNof: " << posNof << std::endl;
+
     std::cout << "message: " << message << std::endl;
 
     std::string messageType = message.substr(posType + 6, posNof - (posType + 6));
