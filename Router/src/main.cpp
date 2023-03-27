@@ -8,7 +8,14 @@
 #include <arpa/inet.h>
 #include <string>
 #include <thread>
-
+// if (bytesRecv == -1) {
+        //     std::cerr << "Connection issue" << std::endl;
+        //     break;
+        // }
+        // if(bytesRecv == 0) {
+        //     std::cout << "Client disconnected" << std::endl;
+        //     break;
+        // }
 void handleClient(int clientSocket, sockaddr_in client, Router & router) {
     std::cout << "`handleClient` successfully called" << std::endl;
     // handle messages
@@ -20,18 +27,9 @@ void handleClient(int clientSocket, sockaddr_in client, Router & router) {
         std::memset(buf, 0, MAX_BUF_SIZE);
         // wait for a message
         int bytesRecv;
-        // if (bytesRecv == -1) {
-        //     std::cerr << "Connection issue" << std::endl;
-        //     break;
-        // }
-        // if(bytesRecv == 0) {
-        //     std::cout << "Client disconnected" << std::endl;
-        //     break;
-        // }
         
         std::string message;
 
-        int valread;
         while ((bytesRecv = recv(clientSocket, buf, MAX_BUF_SIZE, 0)) > 0) {
             std::cout << "Received " << bytesRecv << " bytes: ";
             std::cout.write(buf, bytesRecv);
@@ -69,7 +67,8 @@ void handleClient(int clientSocket, sockaddr_in client, Router & router) {
             std::cout << "invalid message:" << std::endl
                       << message << std::endl;
         }
-        
+
+        message.clear();
     }
 
     // close socket
