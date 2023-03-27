@@ -145,6 +145,8 @@ void Router::pushMessageTo(std::string message) {
         return;
     }
 
+    std::cout << "message: " << message << std::endl;
+
     std::string messageType = message.substr(posType + 6, posNof - (posType + 6));
     handlePacket(messageType, message);
     std::cout << "handlePacket called successfully" << std::endl;
