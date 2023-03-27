@@ -41,6 +41,8 @@ void handleClient(int clientSocket, sockaddr_in client, Router & router) {
         std::string messageType = message.substr(message.find("/type ") + 6, message.find("/nof") - (message.find("/type ") + 6));
         if(messageType == "register") {
             std::cout << "Recognized `register` type" << std::endl;
+            // close socket
+            close(clientSocket);
             Obj* obj = new Obj;
             obj->hostname = message.substr(message.find("/hst ") + 5, message.find("/topic ") -( message.find("/hst ") + 5));
             std::string topic = message.substr(message.find("/topic ") + 7, message.find("/type ") - (message.find("/topic ") + 7));
@@ -61,6 +63,8 @@ void handleClient(int clientSocket, sockaddr_in client, Router & router) {
             router.addObjectToList(obj);
         } else if(messageType == "direct" || messageType == "broadcast") {
             std::cout << "Recognized `direct` or `broadcast` type" << std::endl;
+            // close socket
+            close(clientSocket);
             router.pushMessageTo(message);
         } else {
             std::cout << "invalid message:" << std::endl
