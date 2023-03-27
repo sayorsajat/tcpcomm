@@ -110,6 +110,9 @@ void Router::handlePacket(std::string messageType) {
             std::cout << std::endl;
 
             // define number of tasks to complete
+            if(objects.size() <= 0) {
+                return;
+            }
             std::vector<int> tasks;
             for(int i = 0; i < objects.size(); i++) {
                 tasks.push_back(i);
