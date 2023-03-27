@@ -113,6 +113,7 @@ void Router::handlePacket(std::string messageType, std::string & decoPacket) {
             std::cout << "extracted topic: " << topic << std::endl;
             std::vector<Obj*> objects = getObjectsWithSameTopic(topic);
             if(objects.empty()) {
+                std::cout << "nowhere to send" << std::endl;
                 return;
             }
             std::cout << "objects with same topic extracted" << std::endl;
