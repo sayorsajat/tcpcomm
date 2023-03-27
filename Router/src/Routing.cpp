@@ -98,13 +98,9 @@ void Router::handlePacket(std::string messageType, std::string & decoPacket) {
             sendMessageToClientTask(destinationHost, decoPacket);
         } else if(messageType == "broadcast") {
             std::cout << "message type was recognized as `broadcast`" << std::endl;
-            size_t posTopic = decoPacket.find("/topic ");
-            size_t posHst = decoPacket.find("/hst ");
-            if (posTopic == std::string::npos || posHst == std::string::npos || posTopic >= posHst) {
-                std::cerr << "Invalid message format for broadcast message: " << decoPacket << std::endl;
-                return;
-            }
+            
             std::string topic = decoPacket.substr(decoPacket.find("/topic ") + 7, decoPacket.find("/hst ") - (decoPacket.find("/topic ") + 7));
+            std::cout << "extracted topic: " << topic << std::endl;
             std::vector<Obj*> objects = getObjectsWithSameTopic(topic);
             std::cout << "objects with same topic extracted" << std::endl;
             std::cout << "object hostnames: ";
@@ -146,19 +142,10 @@ void Router::pushMessageTo(std::string message) {
     size_t posType = message.find("/type ");
     size_t posNof = message.find("/nof");
 
-    std::cout << "(pushMessageTo function) size of message: " << message.size() << std::endl;
-    
-    if (posType == std::string::npos || posNof == std::string::npos) {
-        std::cerr << "Invalid message format: " << message << std::endl;
-        return;
-    }
-
     std::cout << "message: " << message << std::endl;
 
-    std::string msgCopy = message;
     std::string messageType = message.substr(posType + 6, posNof - (posType + 6));
-    std::cout << "(pushMessageTo function) size of message: " << message.size() << std::endl;
-    handlePacket(messageType, msgCopy);
+    handlePacket(messageType, message);
     std::cout << "handlePacket called successfully" << std::endl;
 };
 
