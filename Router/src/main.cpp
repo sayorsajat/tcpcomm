@@ -19,22 +19,22 @@ void handleClient(int clientSocket, sockaddr_in client, Router & router) {
         // clear the buffer
         std::memset(buf, 0, MAX_BUF_SIZE);
         // wait for a message
-        int bytesRecv = recv(clientSocket, buf, MAX_BUF_SIZE, 0);
-        if (bytesRecv == -1) {
-            std::cerr << "Connection issue" << std::endl;
-            break;
-        }
-        if(bytesRecv == 0) {
-            std::cout << "Client disconnected" << std::endl;
-            break;
-        }
+        int bytesRecv;
+        // if (bytesRecv == -1) {
+        //     std::cerr << "Connection issue" << std::endl;
+        //     break;
+        // }
+        // if(bytesRecv == 0) {
+        //     std::cout << "Client disconnected" << std::endl;
+        //     break;
+        // }
         
         std::string message;
 
         int valread;
-        while ((valread = read(clientSocket, buf, MAX_BUF_SIZE)) > 0) {
-            std::cout << "Received " << valread << " bytes: ";
-            std::cout.write(buf, valread);
+        while ((bytesRecv = recv(clientSocket, buf, MAX_BUF_SIZE, 0)) > 0) {
+            std::cout << "Received " << bytesRecv << " bytes: ";
+            std::cout.write(buf, bytesRecv);
             std::cout << std::endl;
             message.append(buf, bytesRecv);
             std::memset(buf, 0, MAX_BUF_SIZE);
