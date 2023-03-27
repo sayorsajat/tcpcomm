@@ -83,7 +83,7 @@ void Router::sendMessageToClientTask(Obj* destinationHost, std::string message) 
 };
 
 void Router::handlePacket(std::string messageType, std::string & decoPacket) {
-    if (!messagesBuff.empty()) {
+    if (!decoPacket.empty()) {
         std::cout << "buffer was not empty, all right" << std::endl
                   << "message type: " << messageType << std::endl;
         std::cout << "message: " << decoPacket << std::endl
