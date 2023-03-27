@@ -36,7 +36,7 @@ void handleClient(int clientSocket, sockaddr_in client, Router & router) {
             std::cout << "Received " << valread << " bytes: ";
             std::cout.write(buf, valread);
             std::cout << std::endl;
-            message+=buf;
+            message.append(buf, bytesRecv);
             std::memset(buf, 0, MAX_BUF_SIZE);
         }
 
