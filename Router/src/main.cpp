@@ -28,7 +28,7 @@ void handleClient(int clientSocket, sockaddr_in client, Router & router) {
         // wait for a message
         int bytesRecv;
         
-        std::string message;
+        std::string message = "";
 
         while ((bytesRecv = recv(clientSocket, buf, MAX_BUF_SIZE, 0)) > 0) {
             std::cout << "Received " << bytesRecv << " bytes: ";
@@ -67,8 +67,7 @@ void handleClient(int clientSocket, sockaddr_in client, Router & router) {
             std::cout << "invalid message:" << std::endl
                       << message << std::endl;
         }
-
-        message.clear();
+        
     }
 
     // close socket
