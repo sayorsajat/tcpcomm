@@ -102,6 +102,9 @@ void Router::handlePacket(std::string messageType, std::string & decoPacket) {
             std::string topic = decoPacket.substr(decoPacket.find("/topic ") + 7, decoPacket.find("/hst ") - (decoPacket.find("/topic ") + 7));
             std::cout << "extracted topic: " << topic << std::endl;
             std::vector<Obj*> objects = getObjectsWithSameTopic(topic);
+            if(objects.size() <= 0) {
+                return;
+            }
             std::cout << "objects with same topic extracted" << std::endl;
             std::cout << "object hostnames: ";
             for(auto j: objects) {
@@ -110,9 +113,6 @@ void Router::handlePacket(std::string messageType, std::string & decoPacket) {
             std::cout << std::endl;
 
             // define number of tasks to complete
-            if(objects.size() <= 0) {
-                return;
-            }
             std::vector<int> tasks;
             for(int i = 0; i < objects.size(); i++) {
                 tasks.push_back(i);
