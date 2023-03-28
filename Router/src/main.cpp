@@ -1,6 +1,6 @@
-#include "include/Routing.h"
-#include "include/messagesPassing.h"
+#include "include/tcpServer.h"
 #include <iostream>
+<<<<<<< Updated upstream
 #include <unistd.h>
 #include <netdb.h>
 #include <sys/types.h>
@@ -87,77 +87,12 @@ void handleClient(int clientSocket, sockaddr_in client, Router & router) {
     // close socket
     close(clientSocket);
 }
+=======
+>>>>>>> Stashed changes
 
 int main() {
-    Router router;
-    //create a socket
-    int listening = socket(AF_INET, SOCK_STREAM, 0);
-    if(listening == -1) {
-        std::cerr << "error while creating socket" << std::endl;
-        return -1;
-    }
-
-    //bind the socket to an IP/port
-    sockaddr_in hint;
-    hint.sin_family = AF_INET;
-    hint.sin_port = htons(4554);
-    inet_pton(AF_INET, "0.0.0.0", &hint.sin_addr);
-
-    if(bind(listening, (sockaddr*)&hint, sizeof(hint)) == -1) {
-        std::cerr << "can't bind to port" << std::endl;
-        return -2;
-    }
-    
-    //Mark socket for listening
-    if(listen(listening, SOMAXCONN) == -1) {
-        std::cerr << "can't listen" << std::endl;
-    }
-
-    //Accept a call
-    sockaddr_in client;
-    socklen_t clientSize = sizeof(client);
-    char host[NI_MAXHOST];
-    char svc[NI_MAXSERV];
-
-    std::vector<std::thread> threads;  // container to store threads
-
-    while(true) {
-        int clientSocket = accept(listening, 
-                            (sockaddr*)&client, 
-                            &clientSize);
-
-        if(clientSocket == -1) {
-            std::cerr << "problem with client connecting" << std::endl;
-            return -4;
-        }
-
-        memset(host, 0, NI_MAXHOST);
-        memset(svc, 0, NI_MAXSERV);
-
-        int result = getnameinfo((sockaddr*)&client,
-                            sizeof(client),
-                            host,
-                            NI_MAXHOST,
-                            svc,
-                            NI_MAXSERV,
-                            0);
-    
-        if(result) {
-            std::cout << host << " connected on: " << svc << std::endl;
-        } else {
-            inet_ntop(AF_INET, &client.sin_addr, host, NI_MAXHOST);
-            std::cout << host << " connected on " << ntohs(client.sin_port) << std::endl;
-        }
-
-        int clientSocketCopy = clientSocket;
-
-        threads.emplace_back(handleClient, std::ref(clientSocketCopy), std::ref(client), std::ref(router));// add thread to container
-    }
-
-    // join all threads before exiting
-    for (auto& thread : threads) {
-        thread.join();
-    }
+    TCPHandler handler;
+    handler.BuildRouter(4554);
 
     return 0;
 }
