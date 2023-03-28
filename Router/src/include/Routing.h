@@ -22,7 +22,7 @@ class Router {
         void sendPacket(int clientSocket, std::string packet);
         static void sendMessageToClientTask(Obj* destinationHost, std::string message);
 
-        void handlePacket(std::string messageType);
+        void handlePacket(std::string messageType, std::string & decoPacket);
 };
 
 #endif
