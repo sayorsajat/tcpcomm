@@ -70,18 +70,19 @@ void secondReceiver(Message_T message) {
         return;
     }
 
-    std::string resMessage = createMessage(message.src_host, "response message, do you hear me?!", message.topic, HOSTNAME);
+    std::string resMessage = createDirectMessage(message.src_host, "response message, do you hear me?!", message.topic, HOSTNAME);
 
     // send request
-    int resRequestRes = send(sock, resMessage.c_str(), resMessage.size() + 1, 0);
+    int resRequestRes = send(sock, resMessage.data(), resMessage.size(), 0);
+    close(sock);
 }
 
 
 int main() {
     Router router;
-    Obj firstObj = Obj(router, "first");
+    Obj firstObj = Obj(router, "firstObj");
     Obj secObj = Obj(router, "second");
-    secObj.registerReceiver(router, "basic", secondReceiver);
+    firstObj.registerReceiver(router, "basic", secondReceiver);
 
 
     //create a socket for client part
@@ -126,9 +127,11 @@ int main() {
     }
 
     // send broadcast message because I want to test if another full client will respond to me
-    std::string resMessage = createMessage("message 4 response", "basic", HOSTNAME);
+    std::string resMessage = createBroadcastMessage("message 4 response", "basic", HOSTNAME);
 
     int resRequestRes = send(sock, resMessage.c_str(), resMessage.size(), 0);
+
+    close(sock);
 
 
     // -------------------------------------------------------------
