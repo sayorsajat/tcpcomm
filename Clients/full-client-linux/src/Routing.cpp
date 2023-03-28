@@ -41,7 +41,7 @@ void Router::handlePacket() {
         std::string decoPacket = messagesBuff[messagesBuff.size()-1];
         std::string mBody = decoPacket.substr(decoPacket.find("/body ") + 6, (decoPacket.find("/topic") - (decoPacket.find("/body ") + 6)));
         std::string mTopic = decoPacket.substr(decoPacket.find("/topic ") + 7, (decoPacket.find("/hst") - (decoPacket.find("/topic ") + 7)));
-        std::string host = decoPacket.substr(decoPacket.find("/hst ") + 5, (decoPacket.find("/nof") - (decoPacket.find("/hst ") + 5)));
+        std::string host = decoPacket.substr(decoPacket.find("/hst ") + 5, (decoPacket.find("/type ") - (decoPacket.find("/hst ") + 5)));
         messagesBuff.pop_back();
 
         std::vector<Obj*> destinationHosts = getObjectsByAcceptedTopic(mTopic);
