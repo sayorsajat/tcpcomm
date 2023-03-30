@@ -6,6 +6,7 @@ class Router;
 #include <iostream>
 #include <bits/stdc++.h> 
 #include "Routing.h"
+#include "mailman.h"
 
 class Message {
     public:
@@ -23,7 +24,7 @@ struct Message_T {
 
 struct Receiver {
     std::string path;
-    std::function<void(Message_T message)> receiver;
+    std::function<void(Message_T message, Mailman & mailman)> receiver;
 };
 
 class Obj {
@@ -33,7 +34,7 @@ class Obj {
 
         Obj(Router & router, std::string ID);
 
-        void registerReceiver(Router & router, std::string path, std::function<void(Message_T message)> function) {
+        void registerReceiver(Router & router, std::string path, std::function<void(Message_T message, Mailman & mailman)> function) {
             //unique validation
             for (auto i: receivers) {
                 if(i.path == path) {
@@ -49,10 +50,10 @@ class Obj {
         };
 
         void passMessageTo(Router router, std::string destObjId, std::string messageBody, std::string messageTopic = "basic", bool provideSrcHost = false);
-        void receiveMessage(Message_T message);
+        void receiveMessage(Message_T message, Mailman & mailman);
     private:
         
-        std::function<void(Message_T message)> getFunctionById(std::string topic);
+        std::function<void(Message_T message, Mailman & mailman)> getFunctionById(std::string topic);
 };
 
 #endif

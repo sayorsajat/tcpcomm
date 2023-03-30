@@ -4,8 +4,8 @@
 #include <bitset>
 #include <sstream>
 #include <algorithm>
-#include "include/messagesPassing.h"
-#include "include/Routing.h"
+#include "../include/messagesPassing.h"
+#include "../include/Routing.h"
 
 Obj* Router::getObjectWithID(std::string ID) {
     
@@ -28,7 +28,7 @@ std::vector<Obj*> Router::getObjectsByAcceptedTopic(std::string topic) {
     return objects;
 }
 
-Router::Router() {
+Router::Router(Mailman & mail) : mailman(mail) {
     std::vector<std::string> messagesBuf;
     Router::messagesBuff = messagesBuf;
 
@@ -52,7 +52,7 @@ void Router::handlePacket() {
         messageSignature.src_host = host;
 
         for (auto i: destinationHosts) {
-            i->receiveMessage(messageSignature);
+            i->receiveMessage(messageSignature, mailman);
         }
     }
 };
